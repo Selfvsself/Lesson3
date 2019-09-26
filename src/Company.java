@@ -40,7 +40,7 @@ public class Company {                                                          
                 .getCode().equals(str)).forEach(CompanySecurities::writeFilterCode);
     }
 
-    static LocalDate getDate(String str) {                                                                              //Класс возвращает LocalDate из строки, которая используется json. Используется здесь и ниже в подклассах
+    public static LocalDate getDate(String str) {                                                                              //Класс возвращает LocalDate из строки, которая используется json. Используется здесь и ниже в подклассах
         return LocalDate.parse(str, DateTimeFormatter.ofPattern("yyyy-MM-dd"));
     }
 
@@ -97,23 +97,23 @@ class CompanySecurities {
         return false;
     }
 
-    void writeFilterCode() {                                                                                            //Печатает инфу по бумаге, для пункта 4 дз
+    public void writeFilterCode() {                                                                                            //Печатает инфу по бумаге, для пункта 4 дз
         System.out.println(getId() + " " + getCode());
     }
 
-    int getId() {
+    public int getId() {
         return id;
     }
 
-    String getCode() {
+    public String getCode() {
         return code;
     }
 
-    LocalDate getDate_to() {
+    public LocalDate getDate_to() {
         return Company.getDate(date_to);
     }
 
-    CompanySecuritiesCurrency getCurrency() {
+    public CompanySecuritiesCurrency getCurrency() {
         return currency;
     }
 }

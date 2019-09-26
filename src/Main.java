@@ -9,7 +9,7 @@ import java.util.Scanner;
 public class Main {
 
     private static final int MAIN_MENU = 0;
-    private static final int CHOISE_MENU = -2;
+    private static final int CHOICE_MENU = -2;
     private static final int ALL_INFO_ABOUT_COMPANY = 1;
     private static final int ALL_INFO_ABOUT_SECURITIES = 2;
     private static final int ALL_INFO_ABOUT_DELAY_SECURITIES = 3;
@@ -28,7 +28,7 @@ public class Main {
                 case MAIN_MENU:
                     navigator = mainMenu();
                     break;
-                case CHOISE_MENU:
+                case CHOICE_MENU:
                     navigator = choiseMenu();
                     break;
                 case ALL_INFO_ABOUT_COMPANY:
@@ -51,6 +51,7 @@ public class Main {
     }
 
     public static int mainMenu() {                                                                                      //Класс для главного меню
+        int answerInt = CHOICE_MENU;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Выберите JSON файл для чтения");
         System.out.println("0 - Чтобы выйти");
@@ -62,30 +63,29 @@ public class Main {
 
         File file = new File(pathFile);
         if (pathFile.equals("0")) {                                                                                     //Если ввести "0" то мы выйдем из программы
-            return EXIT_PROGRAM;
+            answerInt = EXIT_PROGRAM;
         } else if (file.exists() && file.isFile()) {                                                                    //Если файл существует и является файлом
             MyReaderJSON myReader = new MyReaderJSON(pathFile);                                                         //Создаю свой reader и даю ему файл
             list = myReader.getCompany();                                                                               //Читаю файл и заполняю коллекцию
-            if (list == null) {                                                                                         //Если лист пустой то считаем что json файл не рапарсен
+            if (list.isEmpty()) {                                                                                         //Если лист пустой то считаем что json файл не рапарсен
+                answerInt = MAIN_MENU;
+            } else {
                 System.out.println();
-                System.out.println("Ошибка чтения файла");
+                System.out.println("Файл успешно загружен");
                 System.out.println();
-                return MAIN_MENU;
             }
-            System.out.println();
-            System.out.println("Файл успешно загружен");
-            System.out.println();
         } else {                                                                                                        //Если файла не существует или он является папкой то выходим обратно в меню
             System.out.println();
             System.out.println("Такого файла не существует " + file);
             System.out.println("Введите другой файл");
             System.out.println();
-            return MAIN_MENU;
+            answerInt = MAIN_MENU;
         }
-        return CHOISE_MENU;
+        return answerInt;
     }
 
     public static int choiseMenu() {                                                                                    //Следующее меню где выполняются действия над файлом
+        int answerInt = CHOICE_MENU;
         Scanner scanner = new Scanner(System.in);
         System.out.println("--------------------------------");
         System.out.println("Выберите дальнейшее действие: ");
@@ -96,32 +96,41 @@ public class Main {
         System.out.println("5 - Отфильтровать компании по коду валют");
         System.out.println("0 - Выйти");
         System.out.println();
-        int index = CHOISE_MENU;
+        int index = CHOICE_MENU;
         try {
             index = scanner.nextInt();
         } catch (InputMismatchException ignored) {
-
+            System.out.println("Нужно ввести цифру");
+            System.out.println();
         }
 
         switch (index) {                                                                                                //Смотрим что ввел пользователь
             case 0:
-                return EXIT_PROGRAM;
+                answerInt = EXIT_PROGRAM;
+                break;
             case 1:
-                return ALL_INFO_ABOUT_COMPANY;
+                answerInt = ALL_INFO_ABOUT_COMPANY;
+                break;
             case 2:
-                return ALL_INFO_ABOUT_SECURITIES;
+                answerInt = ALL_INFO_ABOUT_SECURITIES;
+                break;
             case 3:
-                return ALL_INFO_ABOUT_DELAY_SECURITIES;
+                answerInt = ALL_INFO_ABOUT_DELAY_SECURITIES;
+                break;
             case 4:
-                return FILTER_COMPANY;
+                answerInt = FILTER_COMPANY;
+                break;
             case 5:
-                return FILTER_SECURITIES;
+                answerInt = FILTER_SECURITIES;
+                break;
             default:
                 System.out.println();
                 System.out.println("Ошибка выбора");
                 System.out.println();
-                return CHOISE_MENU;
+                answerInt = CHOICE_MENU;
+                break;
         }
+        return answerInt;
     }
 
     public static int infoAboutCompany() {                                                                              //Выводим список всех компаний, если список не пустой
@@ -132,7 +141,7 @@ public class Main {
             list.forEach(Company::writeShortInfo);
         }
         System.out.println();
-        return CHOISE_MENU;
+        return CHOICE_MENU;
     }
 
     public static int infoAboutSecurities() {                                                                           //Выводим список всех бумаг
@@ -150,7 +159,7 @@ public class Main {
         }
         System.out.println("Всего бумаг: " + count);
         System.out.println();
-        return CHOISE_MENU;
+        return CHOICE_MENU;
     }
 
     public static int infoAboutDelaySecurities() {                                                                      //Выводим список всех просроченных бумаг относительно сегодняшней даты
@@ -167,10 +176,11 @@ public class Main {
         }
         System.out.println("Всего просроченных бумаг: " + count);
         System.out.println();
-        return CHOISE_MENU;
+        return CHOICE_MENU;
     }
 
     public static int filterCompany() {                                                                                 //Фильтруем компании которые основанны после введеной даты
+        int answerInt = CHOICE_MENU;
         Scanner scanner = new Scanner(System.in);
         System.out.println();
         System.out.println("Для фильтрации компаний введите дату в формате ДД.ММ.ГГГГ");
@@ -179,36 +189,36 @@ public class Main {
         String dateStr = scanner.nextLine();
         LocalDate filterDate;
         if (dateStr.equals("0")) {                                                                                      //Если пользователь ввел ноль то выходим в предыдущее меню
-            return CHOISE_MENU;
+            answerInt = CHOICE_MENU;
         } else {
             filterDate = stringToDate(dateStr);                                                                         //Преобразуем введеную строку в LocalDate
-        }
 
-        if (list != null && filterDate != null) {                                                                       //Проверяем что все переменные не пустые
-            System.out.println("Компании которые основаны после " + filterDate);
-            System.out.println();
-            list.stream().filter(comp -> ChronoUnit.DAYS.between(filterDate, comp.getEgrul_date()) > 0)
-                    .forEach(Company::writeInfoDateCompany);                                                            //Пробегаемся по всей коллекции и там где дата основания после введеной выводим на экран
-            System.out.println();
-            return CHOISE_MENU;
+            if (list != null && filterDate != null) {                                                                       //Проверяем что все переменные не пустые
+                System.out.println("Компании которые основаны после " + filterDate);
+                System.out.println();
+                list.stream().filter(comp -> ChronoUnit.DAYS.between(filterDate, comp.getEgrul_date()) > 0)
+                        .forEach(Company::writeInfoDateCompany);                                                            //Пробегаемся по всей коллекции и там где дата основания после введеной выводим на экран
+                System.out.println();
+                answerInt = CHOICE_MENU;
+            }
         }
-        return CHOISE_MENU;
+        return answerInt;
     }
 
     private static LocalDate stringToDate(String str) {                                                                 //Перевод строки в дату
+        LocalDate answer = null;
         String[] valuesDate = str.split("[.,/-]");
         if (valuesDate.length > 2) {                                                                                    //Смотрим что с помощью разделителей получилось не меньше 3 значений
             try {
-                return LocalDate.of(convertYearToNormal(valuesDate[2]),
+                answer = LocalDate.of(convertYearToNormal(valuesDate[2]),
                         Integer.valueOf(valuesDate[1]), Integer.valueOf(valuesDate[0]));                                //Пытаемся перевести строку в дату, смотрим что бы год был четырех значный
             } catch (DateTimeException e) {
                 System.out.println();
                 System.out.println("Неправильно введена дата");
                 System.out.println();
-                return null;
             }
         }
-        return null;
+        return answer;
     }
 
     private static int convertYearToNormal(String valueYear) {                                                          //Если пользователь ввел двух значный год, то переводим его в четырех значный
@@ -216,7 +226,7 @@ public class Main {
         try {
             year = Integer.parseInt(valueYear);
         } catch (IllegalStateException e) {
-            return -1;
+            year = -1;
         }
         if (year < 50) {
             year += 2000;
@@ -227,6 +237,8 @@ public class Main {
     }
 
     private static int filterSecurities() {                                                                             //Выводим все бумаги у которых код валюты совпадает с введеным
+        int answer = CHOICE_MENU;
+        count = 0;
         Scanner scanner = new Scanner(System.in);
         System.out.println("Для фильтрации бумаг введите код валюты, например RUB");
         System.out.println("0 - Чтобы выйти");
@@ -234,11 +246,23 @@ public class Main {
         String codeStr = scanner.nextLine();
 
         if (codeStr.equals("0")) {
-            return CHOISE_MENU;
-        }
+            answer = CHOICE_MENU;
+        } else {
 
-        list.forEach(company -> company.filterCode(codeStr));
-        System.out.println();
-        return CHOISE_MENU;
+            list.forEach(company -> {
+                company.getSecurities().stream().filter(security -> security.getCurrency()
+                        .getCode().equals(codeStr)).forEach(companySecurities -> {
+                            companySecurities.writeFilterCode();
+                            count++;
+                });
+            });
+
+            if (count < 1) {
+                System.out.println();
+                System.out.println("Найденых бумаг нет");
+            }
+            System.out.println();
+        }
+        return answer;
     }
 }

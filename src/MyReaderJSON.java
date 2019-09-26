@@ -16,15 +16,18 @@ public class MyReaderJSON {
     }
 
     public List<Company> getCompany() {                                                                                 //Получаем ArrayList обьектов типа Company
+        List<Company> companies = new ArrayList<>();
         Gson gson = new Gson();
         Type listType = new TypeToken<ArrayList<Company>>() {
         }.getType();
         try {
-            List<Company> companies = gson.fromJson(strJson, listType);                                                 //Пытаемся получить коллекцию обьектов, в случае неудачи возвращаем пустой ArrayList
-            return companies;
+            companies = gson.fromJson(strJson, listType);                                                 //Пытаемся получить коллекцию обьектов, в случае неудачи возвращаем пустой ArrayList
         } catch (Exception e) {
-            return null;
+            System.out.println();
+            System.out.println("Ошибка чтения файла");
+            System.out.println();
         }
+        return companies;
     }
 
     private String readFile(String file) {                                                                              //Посимвольно читаем файл и преобразуем байты в символы
